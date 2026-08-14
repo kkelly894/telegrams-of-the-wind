@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router";
 
 import { useAuth } from "./AuthContext";
 
-/** A form that allows users to register for a new account */
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -12,9 +11,24 @@ export default function Register() {
 
   const onRegister = async (formData) => {
     const username = formData.get("username");
+    const email = formData.get("email");
     const password = formData.get("password");
+    const confirmPassword = formData.get("confirmPassword");
+
+    setError(null);
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     try {
-      await register({ username, password });
+      await register({
+        username,
+        email,
+        password,
+      });
+
       navigate("/");
     } catch (e) {
       setError(e.message);
@@ -22,21 +36,42 @@ export default function Register() {
   };
 
   return (
-    <>
-      <h1>Register for an account</h1>
-      <form action={onRegister}>
-        <label>
-          Username
-          <input type="text" name="username" />
-        </label>
-        <label>
-          Password
-          <input type="password" name="password" required />
-        </label>
-        <button>Register</button>
-        {error && <output>{error}</output>}
-      </form>
-      <Link to="/login">Already have an account? Log in here.</Link>
-    </>
+    <section className="auth-page">
+      <div className="auth-paper">
+        <h1>REGISTER</h1>
+
+        <form className="auth-form" action={onRegister}>
+          <label>
+            USERNAME
+            <input type="text" name="username" required />
+          </label>
+
+          <label>
+            EMAIL
+            <input type="email" name="email" required />
+          </label>
+
+          <label>
+            PASSWORD
+            <input type="password" name="password" required />
+          </label>
+
+          <label>
+            CONFIRM PASSWORD
+            <input type="password" name="confirmPassword" required />
+          </label>
+
+          {error && <output className="auth-error">{error}</output>}
+
+          <button className="auth-button" type="submit">
+            CREATE ACCOUNT
+          </button>
+        </form>
+
+        <p className="auth-switch">
+          Already have an account? <Link to="/login">Login</Link>
+        </p>
+      </div>
+    </section>
   );
 }

@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router";
 
 import { useAuth } from "./AuthContext";
 
-/** A form that allows users to log into an existing account. */
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -11,10 +10,17 @@ export default function Login() {
   const [error, setError] = useState(null);
 
   const onLogin = async (formData) => {
-    const username = formData.get("username");
+    const email = formData.get("email");
     const password = formData.get("password");
+
+    setError(null);
+
     try {
-      await login({ username, password });
+      await login({
+        email,
+        password,
+      });
+
       navigate("/");
     } catch (e) {
       setError(e.message);
@@ -22,21 +28,32 @@ export default function Login() {
   };
 
   return (
-    <>
-      <h1>Log in to your account</h1>
-      <form action={onLogin}>
-        <label>
-          Username
-          <input type="username" name="username" required />
-        </label>
-        <label>
-          Password
-          <input type="password" name="password" required />
-        </label>
-        <button>Login</button>
-        {error && <output>{error}</output>}
-      </form>
-      <Link to="/register">Need an account? Register here.</Link>
-    </>
+    <section className="auth-page">
+      <div className="auth-paper">
+        <h1>LOGIN</h1>
+
+        <form className="auth-form" action={onLogin}>
+          <label>
+            EMAIL
+            <input type="email" name="email" required />
+          </label>
+
+          <label>
+            PASSWORD
+            <input type="password" name="password" required />
+          </label>
+
+          {error && <output className="auth-error">{error}</output>}
+
+          <button className="auth-button" type="submit">
+            LOGIN
+          </button>
+        </form>
+
+        <p className="auth-switch">
+          Don't have an account? <Link to="/register">Register</Link>
+        </p>
+      </div>
+    </section>
   );
 }
