@@ -1,5 +1,5 @@
 {
-  "name": "foobar",
+  "name": "telegrams-of-the-wind-frontend",
   "type": "module",
   "scripts": {
     "dev": "vite",
