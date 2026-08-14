@@ -28,6 +28,8 @@ export default function About() {
             reach for my phone and text his number, from the reels I still send
             to him in the middle of the night. Grief doesn't eradicate our
             desire to speak to someone just because they can no longer answer.
+          </p>
+          <p>
             In my own grief, I had a realization that not everyone has a phone
             number they can still text and not every loved one occupied a
             digital space that we can still revisit. I wanted to create a place

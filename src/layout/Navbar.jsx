@@ -1,20 +1,45 @@
+import { useState } from "react";
 import { NavLink } from "react-router";
 
-import { useAuth } from "../auth/AuthContext";
-
 export default function Navbar() {
-  const { token, logout } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  function toggleMenu() {
+    setMenuOpen(!menuOpen);
+  }
+
+  function closeMenu() {
+    setMenuOpen(false);
+  }
+
   return (
-    <header id="navbar">
-      <NavLink id="brand" to="/">
-        <p>Frontend Template</p>
-      </NavLink>
-      <nav>
-        {token ? (
-          <button onClick={logout}>Log out</button>
-        ) : (
-          <NavLink to="/login">Log in</NavLink>
+    <header className="navbar">
+      <div className="menu-container">
+        <button className="menu-button" onClick={toggleMenu}>
+          ☰ Menu
+        </button>
+
+        {menuOpen && (
+          <div className="dropdown-menu">
+            <NavLink to="/telegrams" onClick={closeMenu}>
+              All Telegrams
+            </NavLink>
+
+            <NavLink to="/telegrams/create" onClick={closeMenu}>
+              Create New Telegram
+            </NavLink>
+          </div>
         )}
+      </div>
+
+      <NavLink className="brand" to="/">
+        Telegrams of the Wind
+      </NavLink>
+
+      <nav className="navbar-links">
+        <NavLink to="/">About</NavLink>
+        <NavLink to="/register">Register</NavLink>
+        <NavLink to="/login">Log In</NavLink>
       </nav>
     </header>
   );
