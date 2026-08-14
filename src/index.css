@@ -71,6 +71,25 @@ a {
   background-color: #ead4a8;
 }
 
+.logout-button {
+  padding: 0;
+
+  border: none;
+
+  background: none;
+
+  color: #372d25;
+
+  font-family: "Special Elite", system-ui;
+  font-weight: 400;
+
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  text-decoration: underline;
+}
+
 .dropdown-menu {
   position: absolute;
   top: 48px;

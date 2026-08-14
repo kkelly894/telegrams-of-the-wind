@@ -1,22 +1,34 @@
 import { useState } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
+
+import { useAuth } from "../auth/AuthContext";
 
 export default function Navbar() {
+  const { token, logout } = useAuth();
+
+  const navigate = useNavigate();
+
   const [menuOpen, setMenuOpen] = useState(false);
 
-  function toggleMenu() {
+  const toggleMenu = () => {
     setMenuOpen(!menuOpen);
-  }
+  };
 
-  function closeMenu() {
+  const closeMenu = () => {
     setMenuOpen(false);
-  }
+  };
+
+  const handleLogout = () => {
+    logout();
+    closeMenu();
+    navigate("/");
+  };
 
   return (
     <header className="navbar">
       <div className="menu-container">
-        <button className="menu-button" onClick={toggleMenu}>
-          ☰ Menu
+        <button className="menu-button" type="button" onClick={toggleMenu}>
+          Menu
         </button>
 
         {menuOpen && (
@@ -25,9 +37,17 @@ export default function Navbar() {
               All Telegrams
             </NavLink>
 
-            <NavLink to="/telegrams/create" onClick={closeMenu}>
-              Create New Telegram
-            </NavLink>
+            {token && (
+              <>
+                <NavLink to="/telegrams/create" onClick={closeMenu}>
+                  Create New Telegram
+                </NavLink>
+
+                <NavLink to="/account/telegrams" onClick={closeMenu}>
+                  My Telegrams
+                </NavLink>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -38,8 +58,22 @@ export default function Navbar() {
 
       <nav className="navbar-links">
         <NavLink to="/">About</NavLink>
-        <NavLink to="/register">Register</NavLink>
-        <NavLink to="/login">Log In</NavLink>
+
+        {token ? (
+          <button
+            className="logout-button"
+            type="button"
+            onClick={handleLogout}
+          >
+            Log Out
+          </button>
+        ) : (
+          <>
+            <NavLink to="/register">Register</NavLink>
+
+            <NavLink to="/login">Log In</NavLink>
+          </>
+        )}
       </nav>
     </header>
   );
