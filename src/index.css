@@ -346,3 +346,63 @@ a {
 
   font-weight: bold;
 }
+
+.envelope-link {
+  color: #372d25;
+
+  text-decoration: none;
+}
+
+.envelope {
+  width: 320px;
+  min-height: 190px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  padding: 25px;
+
+  border: 1px solid #9f8565;
+
+  background-color: #f8efd9;
+
+  color: #372d25;
+
+  box-shadow: 5px 5px 0 rgba(55, 45, 37, 0.1);
+
+  cursor: pointer;
+}
+
+.envelope:hover {
+  background-color: #f2e4c5;
+}
+
+.envelope-recipient {
+  text-align: center;
+}
+
+.envelope-recipient p,
+.envelope-sender p,
+.envelope-date {
+  margin: 0;
+}
+
+.envelope-recipient h2 {
+  margin: 5px 0;
+
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.envelope-sender {
+  margin-top: 30px;
+}
+
+.envelope-date {
+  margin-top: 15px;
+
+  font-size: 0.8rem;
+
+  text-align: right;
+}
