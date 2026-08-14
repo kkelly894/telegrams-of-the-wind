@@ -1,11 +1,13 @@
 import { Link, useParams } from "react-router";
 
-import { mockTelegrams } from "../data/mockTelegrams";
+import { useTelegrams } from "../context/TelegramContext";
 
 export default function TelegramDetails() {
   const { id } = useParams();
 
-  const telegram = mockTelegrams.find((telegram) => telegram.id === Number(id));
+  const { telegrams } = useTelegrams();
+
+  const telegram = telegrams.find((telegram) => telegram.id === Number(id));
 
   if (!telegram) {
     return (
@@ -28,6 +30,7 @@ export default function TelegramDetails() {
       <article className="telegram-paper">
         <div className="telegram-details-header">
           <p>To:</p>
+
           <h1>{telegram.recipient_name}</h1>
         </div>
 

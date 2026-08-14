@@ -1,7 +1,9 @@
-import { mockTelegrams } from "../data/mockTelegrams";
 import Envelope from "../components/Envelope";
+import { useTelegrams } from "../context/TelegramContext";
 
 export default function AllTelegrams() {
+  const { telegrams } = useTelegrams();
+
   return (
     <section className="all-telegrams-page">
       <div className="all-telegrams-header">
@@ -11,7 +13,7 @@ export default function AllTelegrams() {
       </div>
 
       <div className="telegram-grid">
-        {mockTelegrams.map((telegram) => (
+        {telegrams.map((telegram) => (
           <Envelope key={telegram.id} telegram={telegram} />
         ))}
       </div>

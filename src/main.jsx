@@ -1,13 +1,21 @@
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
-import App from "./App.jsx";
-import { AuthProvider } from "./auth/AuthContext.jsx";
+
+import App from "./App";
+import { AuthProvider } from "./auth/AuthContext";
+import { TelegramProvider } from "./context/TelegramContext";
+
 import "./index.css";
 
 createRoot(document.getElementById("root")).render(
-  <AuthProvider>
+  <StrictMode>
     <BrowserRouter>
-      <App />
+      <AuthProvider>
+        <TelegramProvider>
+          <App />
+        </TelegramProvider>
+      </AuthProvider>
     </BrowserRouter>
-  </AuthProvider>,
+  </StrictMode>,
 );

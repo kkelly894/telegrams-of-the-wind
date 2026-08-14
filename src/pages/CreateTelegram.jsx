@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
+import { useTelegrams } from "../context/TelegramContext";
+
 export default function CreateTelegram() {
   const navigate = useNavigate();
+
+  const { createTelegram } = useTelegrams();
 
   const [error, setError] = useState(null);
 
@@ -19,16 +23,18 @@ export default function CreateTelegram() {
       return;
     }
 
-    const newTelegram = {
-      recipient_name: recipientName,
-      sender_name: senderName,
-      message,
-      is_anonymous: isAnonymous,
-    };
+    try {
+      const newTelegram = createTelegram({
+        recipient_name: recipientName,
+        sender_name: senderName,
+        message,
+        is_anonymous: isAnonymous,
+      });
 
-    console.log("New Telegram:", newTelegram);
-
-    navigate("/telegrams");
+      navigate(`/telegrams/${newTelegram.id}`);
+    } catch (e) {
+      setError(e.message);
+    }
   };
 
   return (
