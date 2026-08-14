@@ -516,3 +516,123 @@ a {
 
   color: #372d25;
 }
+
+.create-telegram-page {
+  min-height: calc(100vh - 85px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 40px 20px;
+}
+
+.telegram-form-paper {
+  width: 700px;
+  max-width: 100%;
+
+  padding: 40px 60px;
+
+  border: 1px solid #9f8565;
+
+  background-color: #f8efd9;
+
+  color: #372d25;
+
+  box-shadow: 6px 6px 0 rgba(55, 45, 37, 0.1);
+}
+
+.telegram-form-paper h1 {
+  margin: 0;
+
+  text-align: center;
+
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+.telegram-form-divider {
+  width: 150px;
+  height: 1px;
+
+  margin: 10px auto 25px;
+
+  background-color: #9f8565;
+}
+
+.telegram-form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+.telegram-form label {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.telegram-form input,
+.telegram-form textarea {
+  width: 100%;
+
+  padding: 10px;
+
+  border: 1px solid #9f8565;
+
+  background-color: #fffaf0;
+
+  color: #372d25;
+
+  font-family: "Special Elite", system-ui;
+  font-weight: 400;
+}
+
+.telegram-form textarea {
+  resize: vertical;
+}
+
+.anonymous-option {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+
+  gap: 8px !important;
+}
+
+.anonymous-option input {
+  width: auto;
+}
+
+.telegram-form-button {
+  align-self: center;
+
+  padding: 10px 25px;
+
+  border: 1px solid #705a43;
+  border-radius: 4px;
+
+  background-color: #e8d5ae;
+
+  color: #372d25;
+
+  font-family: "Special Elite", system-ui;
+
+  cursor: pointer;
+}
+
+.telegram-form-button:hover {
+  background-color: #dbc398;
+}
+
+.telegram-form-error {
+  padding: 8px;
+
+  border: 1px solid #925b50;
+
+  background-color: #f4ddd5;
+
+  text-align: center;
+}
