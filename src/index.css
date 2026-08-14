@@ -636,3 +636,28 @@ a {
 
   text-align: center;
 }
+
+.sort-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 25px;
+}
+
+.sort-controls select {
+  padding: 8px 12px;
+
+  border: 1px solid #9f8565;
+
+  background-color: #fffaf0;
+
+  color: #372d25;
+
+  font-family: "Special Elite", system-ui;
+  font-weight: 400;
+
+  cursor: pointer;
+}
