@@ -4,7 +4,9 @@ import Layout from "./layout/Layout";
 import About from "./pages/About";
 import AllTelegrams from "./pages/AllTelegrams";
 import CreateTelegram from "./pages/CreateTelegram";
+import MyTelegrams from "./pages/MyTelegrams";
 import TelegramDetails from "./pages/TelegramDetails";
+
 import Login from "./auth/Login";
 import Register from "./auth/Register";
 
@@ -23,6 +25,8 @@ export default function App() {
         <Route path="/telegrams/create" element={<CreateTelegram />} />
 
         <Route path="/telegrams/:id" element={<TelegramDetails />} />
+
+        <Route path="/account/telegrams" element={<MyTelegrams />} />
       </Route>
     </Routes>
   );
