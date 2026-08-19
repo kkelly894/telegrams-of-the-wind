@@ -1,16 +1,23 @@
 import { createContext, useContext, useState } from "react";
 
 import { mockTelegrams } from "../data/mockTelegrams";
+import { useAuth } from "../auth/AuthContext";
 
 const TelegramContext = createContext();
 
 export function TelegramProvider({ children }) {
   const [telegrams, setTelegrams] = useState(mockTelegrams);
 
+  const { user } = useAuth();
+
   const createTelegram = (telegramData) => {
+    if (!user) {
+      throw Error("You must be logged in to create a telegram.");
+    }
+
     const newTelegram = {
       id: Date.now(),
-      user_id: 1,
+      user_id: user.id,
       recipient_name: telegramData.recipient_name,
       sender_name: telegramData.sender_name,
       message: telegramData.message,
