@@ -30,9 +30,62 @@ export function TelegramProvider({ children }) {
     return newTelegram;
   };
 
+  const updateTelegram = (id, telegramData) => {
+    if (!user) {
+      throw Error("You must be logged in to edit a telegram.");
+    }
+
+    const telegram = telegrams.find((telegram) => telegram.id === Number(id));
+
+    if (!telegram) {
+      throw Error("Telegram not found.");
+    }
+
+    if (telegram.user_id !== user.id) {
+      throw Error("You can only edit your own telegrams.");
+    }
+
+    const updatedTelegram = {
+      ...telegram,
+      recipient_name: telegramData.recipient_name,
+      message: telegramData.message,
+      is_anonymous: telegramData.is_anonymous,
+    };
+
+    setTelegrams((currentTelegrams) =>
+      currentTelegrams.map((telegram) =>
+        telegram.id === Number(id) ? updatedTelegram : telegram,
+      ),
+    );
+
+    return updatedTelegram;
+  };
+
+  const deleteTelegram = (id) => {
+    if (!user) {
+      throw Error("You must be logged in to delete a telegram.");
+    }
+
+    const telegram = telegrams.find((telegram) => telegram.id === Number(id));
+
+    if (!telegram) {
+      throw Error("Telegram not found.");
+    }
+
+    if (telegram.user_id !== user.id) {
+      throw Error("You can only delete your own telegrams.");
+    }
+
+    setTelegrams((currentTelegrams) =>
+      currentTelegrams.filter((telegram) => telegram.id !== Number(id)),
+    );
+  };
+
   const value = {
     telegrams,
     createTelegram,
+    updateTelegram,
+    deleteTelegram,
   };
 
   return (

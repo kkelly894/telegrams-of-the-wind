@@ -1,50 +1,76 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
-import Envelope from "../components/Envelope";
 import { useTelegrams } from "../context/TelegramContext";
 
-export default function AllTelegrams() {
-  const { telegrams } = useTelegrams();
+export default function CreateTelegram() {
+  const navigate = useNavigate();
 
-  const [sortOrder, setSortOrder] = useState("newest");
+  const { createTelegram } = useTelegrams();
 
-  const sortedTelegrams = [...telegrams].sort((a, b) => {
-    const dateA = new Date(a.created_at);
-    const dateB = new Date(b.created_at);
+  const [error, setError] = useState(null);
 
-    if (sortOrder === "newest") {
-      return dateB - dateA;
+  const onCreateTelegram = async (formData) => {
+    const recipientName = formData.get("recipient_name");
+    const senderName = formData.get("sender_name");
+    const message = formData.get("message");
+    const isAnonymous = formData.get("is_anonymous") === "on";
+
+    setError(null);
+
+    if (!recipientName || !senderName || !message) {
+      setError("Please fill out all required fields.");
+      return;
     }
 
-    return dateA - dateB;
-  });
+    try {
+      const newTelegram = createTelegram({
+        recipient_name: recipientName,
+        sender_name: senderName,
+        message,
+        is_anonymous: isAnonymous,
+      });
+
+      navigate(`/telegrams/${newTelegram.id}`);
+    } catch (e) {
+      setError(e.message);
+    }
+  };
 
   return (
-    <section className="all-telegrams-page">
-      <div className="all-telegrams-header">
-        <h1>All Telegrams</h1>
+    <section className="create-telegram-page">
+      <div className="telegram-form-paper">
+        <h1>Create New Telegram</h1>
 
-        <p>Messages carried by love, memory, and the wind.</p>
+        <div className="telegram-form-divider"></div>
 
-        <div className="sort-controls">
-          <label htmlFor="sortOrder">Sort by:</label>
+        <form className="telegram-form" action={onCreateTelegram}>
+          <label>
+            Recipient Name
+            <input type="text" name="recipient_name" required />
+          </label>
 
-          <select
-            id="sortOrder"
-            value={sortOrder}
-            onChange={(event) => setSortOrder(event.target.value)}
-          >
-            <option value="newest">Newest</option>
+          <label>
+            Sender Name
+            <input type="text" name="sender_name" required />
+          </label>
 
-            <option value="oldest">Oldest</option>
-          </select>
-        </div>
-      </div>
+          <label>
+            Message
+            <textarea name="message" rows="10" required></textarea>
+          </label>
 
-      <div className="telegram-grid">
-        {sortedTelegrams.map((telegram) => (
-          <Envelope key={telegram.id} telegram={telegram} />
-        ))}
+          <label className="anonymous-option">
+            <input type="checkbox" name="is_anonymous" />
+            Display sender as Anonymous
+          </label>
+
+          {error && <output className="telegram-form-error">{error}</output>}
+
+          <button className="telegram-form-button" type="submit">
+            Send Telegram
+          </button>
+        </form>
       </div>
     </section>
   );

@@ -666,3 +666,54 @@ a {
 
   color: #705a43;
 }
+
+.cancel-edit-link {
+  display: block;
+
+  margin-top: 20px;
+
+  color: #372d25;
+
+  text-align: center;
+}
+
+.telegram-details-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 20px;
+}
+
+.edit-telegram-link {
+  margin-top: 35px;
+
+  color: #372d25;
+}
+
+.owner-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.delete-telegram-button {
+  margin-top: 35px;
+
+  padding: 0;
+
+  border: none;
+
+  background: none;
+
+  color: #925b50;
+
+  font-family: "Special Elite", system-ui;
+  font-weight: 400;
+
+  cursor: pointer;
+}
+
+.delete-telegram-button:hover {
+  text-decoration: underline;
+}

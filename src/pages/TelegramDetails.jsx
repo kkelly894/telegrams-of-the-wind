@@ -1,11 +1,18 @@
-import { Link, useParams } from "react-router";
+import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router";
 
+import { useAuth } from "../auth/AuthContext";
 import { useTelegrams } from "../context/TelegramContext";
 
 export default function TelegramDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
-  const { telegrams } = useTelegrams();
+  const { user } = useAuth();
+
+  const { telegrams, deleteTelegram } = useTelegrams();
+
+  const [error, setError] = useState(null);
 
   const telegram = telegrams.find((telegram) => telegram.id === Number(id));
 
@@ -25,12 +32,24 @@ export default function TelegramDetails() {
 
   const createdDate = new Date(telegram.created_at).toLocaleDateString();
 
+  const isOwner = user && user.id === telegram.user_id;
+
+  const handleDelete = () => {
+    setError(null);
+
+    try {
+      deleteTelegram(telegram.id);
+      navigate("/account/telegrams");
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
   return (
     <section className="telegram-details-page">
       <article className="telegram-paper">
         <div className="telegram-details-header">
           <p>To:</p>
-
           <h1>{telegram.recipient_name}</h1>
         </div>
 
@@ -47,9 +66,32 @@ export default function TelegramDetails() {
           <p>{createdDate}</p>
         </div>
 
-        <Link className="back-to-telegrams" to="/telegrams">
-          Back to All Telegrams
-        </Link>
+        {error && <output className="telegram-form-error">{error}</output>}
+
+        <div className="telegram-details-actions">
+          <Link className="back-to-telegrams" to="/telegrams">
+            Back to All Telegrams
+          </Link>
+
+          {isOwner && (
+            <div className="owner-actions">
+              <Link
+                className="edit-telegram-link"
+                to={`/telegrams/${telegram.id}/edit`}
+              >
+                Edit Telegram
+              </Link>
+
+              <button
+                className="delete-telegram-button"
+                type="button"
+                onClick={handleDelete}
+              >
+                Delete Telegram
+              </button>
+            </div>
+          )}
+        </div>
       </article>
     </section>
   );

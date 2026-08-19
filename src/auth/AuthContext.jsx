@@ -1,13 +1,19 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-const API = import.meta.env.VITE_API;
-
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(sessionStorage.getItem("token"));
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = sessionStorage.getItem("user");
+
+    if (savedUser) {
+      return JSON.parse(savedUser);
+    }
+
+    return null;
+  });
 
   useEffect(() => {
     if (token) {
@@ -17,26 +23,31 @@ export function AuthProvider({ children }) {
     }
   }, [token]);
 
+  useEffect(() => {
+    if (user) {
+      sessionStorage.setItem("user", JSON.stringify(user));
+    } else {
+      sessionStorage.removeItem("user");
+    }
+  }, [user]);
+
   const register = async (credentials) => {
     try {
-      const response = await fetch(API + "/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-      });
+      const mockUser = {
+        id: 1,
+        username: credentials.username,
+        email: credentials.email,
+      };
 
-      const result = await response.json();
+      const mockToken = "mock-token";
 
-      if (!response.ok) {
-        throw Error(result.message || "Registration failed.");
-      }
+      setUser(mockUser);
+      setToken(mockToken);
 
-      setToken(result.token);
-      setUser(result.user);
-
-      return result;
+      return {
+        token: mockToken,
+        user: mockUser,
+      };
     } catch (e) {
       throw e;
     }
@@ -44,45 +55,21 @@ export function AuthProvider({ children }) {
 
   const login = async (credentials) => {
     try {
-      const response = await fetch(API + "/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-      });
+      const mockUser = {
+        id: 1,
+        username: "exampleUser",
+        email: credentials.email,
+      };
 
-      const result = await response.json();
+      const mockToken = "mock-token";
 
-      if (!response.ok) {
-        throw Error(result.message || "Login failed.");
-      }
+      setUser(mockUser);
+      setToken(mockToken);
 
-      setToken(result.token);
-
-      return result;
-    } catch (e) {
-      throw e;
-    }
-  };
-
-  const getCurrentUser = async () => {
-    try {
-      const response = await fetch(API + "/api/auth/current-user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw Error(result.message || "Unable to get current user.");
-      }
-
-      setUser(result);
-
-      return result;
+      return {
+        token: mockToken,
+        user: mockUser,
+      };
     } catch (e) {
       throw e;
     }
@@ -91,6 +78,9 @@ export function AuthProvider({ children }) {
   const logout = () => {
     setToken(null);
     setUser(null);
+
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
   };
 
   const value = {
@@ -98,7 +88,6 @@ export function AuthProvider({ children }) {
     user,
     register,
     login,
-    getCurrentUser,
     logout,
   };
 
