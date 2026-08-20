@@ -13,6 +13,7 @@ import MyTelegrams from "./pages/MyTelegrams";
 import TelegramDetails from "./pages/TelegramDetails";
 
 import Login from "./auth/Login";
+import ProtectedRoute from "./auth/ProtectedRoute";
 import Register from "./auth/Register";
 
 export default function App() {
@@ -27,19 +28,61 @@ export default function App() {
 
         <Route path="/telegrams" element={<AllTelegrams />} />
 
-        <Route path="/telegrams/create" element={<CreateTelegram />} />
-
         <Route path="/telegrams/:id" element={<TelegramDetails />} />
 
-        <Route path="/telegrams/:id/edit" element={<EditTelegram />} />
+        <Route
+          path="/telegrams/create"
+          element={
+            <ProtectedRoute>
+              <CreateTelegram />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/account/telegrams" element={<MyTelegrams />} />
+        <Route
+          path="/telegrams/:id/edit"
+          element={
+            <ProtectedRoute>
+              <EditTelegram />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/drafts" element={<Drafts />} />
+        <Route
+          path="/account/telegrams"
+          element={
+            <ProtectedRoute>
+              <MyTelegrams />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/drafts/:id/edit" element={<EditDraft />} />
+        <Route
+          path="/drafts"
+          element={
+            <ProtectedRoute>
+              <Drafts />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/favorites" element={<Favorites />} />
+        <Route
+          path="/drafts/:id/edit"
+          element={
+            <ProtectedRoute>
+              <EditDraft />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/favorites"
+          element={
+            <ProtectedRoute>
+              <Favorites />
+            </ProtectedRoute>
+          }
+        />
       </Route>
     </Routes>
   );
