@@ -131,3 +131,49 @@ export async function updateTelegram(
     throw error;
   }
 }
+
+export async function deleteTelegram(id, userId) {
+  try {
+    const result = await db.query(
+      `
+        DELETE FROM telegrams
+        WHERE id = $1
+          AND user_id = $2
+          AND status = 'sent'
+        RETURNING id;
+      `,
+      [id, userId],
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function getTelegramsByUserId(userId) {
+  try {
+    const result = await db.query(
+      `
+        SELECT
+          id,
+          user_id,
+          recipient_name,
+          sender_name,
+          message,
+          is_anonymous,
+          status,
+          created_at
+        FROM telegrams
+        WHERE user_id = $1
+          AND status = 'sent'
+        ORDER BY created_at DESC;
+      `,
+      [userId],
+    );
+
+    return result.rows;
+  } catch (error) {
+    throw error;
+  }
+}

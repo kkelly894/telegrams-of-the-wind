@@ -4,6 +4,7 @@ import authenticate from "../middleware/authenticate.js";
 
 import {
   createTelegram,
+  deleteTelegram,
   getAllTelegrams,
   getTelegramById,
   updateTelegram,
@@ -121,6 +122,29 @@ router.patch("/:id", authenticate, async (req, res) => {
 
     return res.status(500).json({
       message: "Unable to update telegram.",
+    });
+  }
+});
+
+router.delete("/:id", authenticate, async (req, res) => {
+  try {
+    const deletedTelegram = await deleteTelegram(req.params.id, req.user.id);
+
+    if (!deletedTelegram) {
+      return res.status(404).json({
+        message:
+          "Telegram not found or you do not have permission to delete it.",
+      });
+    }
+
+    return res.json({
+      message: "Telegram deleted successfully.",
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Unable to delete telegram.",
     });
   }
 });

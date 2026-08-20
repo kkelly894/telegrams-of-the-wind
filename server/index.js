@@ -3,6 +3,7 @@ import "dotenv/config";
 import cors from "cors";
 import express from "express";
 
+import accountRouter from "./routes/account.js";
 import authRouter from "./routes/auth.js";
 import telegramRouter from "./routes/telegrams.js";
 
@@ -14,7 +15,10 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRouter);
+
 app.use("/api/telegrams", telegramRouter);
+
+app.use("/api/account", accountRouter);
 
 app.get("/", (req, res) => {
   res.json({
