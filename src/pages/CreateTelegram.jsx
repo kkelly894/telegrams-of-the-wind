@@ -6,7 +6,7 @@ import { useTelegrams } from "../context/TelegramContext";
 export default function CreateTelegram() {
   const navigate = useNavigate();
 
-  const { createTelegram } = useTelegrams();
+  const { createTelegram, saveDraft } = useTelegrams();
 
   const [error, setError] = useState(null);
 
@@ -16,14 +16,30 @@ export default function CreateTelegram() {
     const message = formData.get("message");
     const isAnonymous = formData.get("is_anonymous") === "on";
 
+    const action = formData.get("action");
+
     setError(null);
 
-    if (!recipientName || !senderName || !message) {
-      setError("Please fill out all required fields.");
-      return;
+    if (action === "send") {
+      if (!recipientName || !senderName || !message) {
+        setError("Please fill out all required fields.");
+        return;
+      }
     }
 
     try {
+      if (action === "draft") {
+        saveDraft({
+          recipient_name: recipientName,
+          sender_name: senderName,
+          message,
+          is_anonymous: isAnonymous,
+        });
+
+        navigate("/drafts");
+        return;
+      }
+
       const newTelegram = createTelegram({
         recipient_name: recipientName,
         sender_name: senderName,
@@ -47,17 +63,17 @@ export default function CreateTelegram() {
         <form className="telegram-form" action={onCreateTelegram}>
           <label>
             Recipient Name
-            <input type="text" name="recipient_name" required />
+            <input type="text" name="recipient_name" />
           </label>
 
           <label>
             Sender Name
-            <input type="text" name="sender_name" required />
+            <input type="text" name="sender_name" />
           </label>
 
           <label>
             Message
-            <textarea name="message" rows="10" required></textarea>
+            <textarea name="message" rows="10"></textarea>
           </label>
 
           <label className="anonymous-option">
@@ -67,9 +83,25 @@ export default function CreateTelegram() {
 
           {error && <output className="telegram-form-error">{error}</output>}
 
-          <button className="telegram-form-button" type="submit">
-            Send Telegram
-          </button>
+          <div className="telegram-form-actions">
+            <button
+              className="telegram-form-button"
+              type="submit"
+              name="action"
+              value="send"
+            >
+              Send Telegram
+            </button>
+
+            <button
+              className="draft-button"
+              type="submit"
+              name="action"
+              value="draft"
+            >
+              Save Draft
+            </button>
+          </div>
         </form>
       </div>
     </section>

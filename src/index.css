@@ -606,7 +606,8 @@ a {
   width: auto;
 }
 
-.telegram-form-button {
+.telegram-form-button,
+.draft-button {
   align-self: center;
 
   padding: 10px 25px;
@@ -623,7 +624,8 @@ a {
   cursor: pointer;
 }
 
-.telegram-form-button:hover {
+.telegram-form-button:hover,
+.draft-button:hover {
   background-color: #dbc398;
 }
 

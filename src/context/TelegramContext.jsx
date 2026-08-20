@@ -22,12 +22,34 @@ export function TelegramProvider({ children }) {
       sender_name: telegramData.sender_name,
       message: telegramData.message,
       is_anonymous: telegramData.is_anonymous,
+      status: "sent",
       created_at: new Date().toISOString(),
     };
 
     setTelegrams((currentTelegrams) => [newTelegram, ...currentTelegrams]);
 
     return newTelegram;
+  };
+
+  const saveDraft = (telegramData) => {
+    if (!user) {
+      throw Error("You must be logged in to save a draft.");
+    }
+
+    const newDraft = {
+      id: Date.now(),
+      user_id: user.id,
+      recipient_name: telegramData.recipient_name,
+      sender_name: telegramData.sender_name,
+      message: telegramData.message,
+      is_anonymous: telegramData.is_anonymous,
+      status: "draft",
+      created_at: new Date().toISOString(),
+    };
+
+    setTelegrams((currentTelegrams) => [newDraft, ...currentTelegrams]);
+
+    return newDraft;
   };
 
   const updateTelegram = (id, telegramData) => {
@@ -84,6 +106,7 @@ export function TelegramProvider({ children }) {
   const value = {
     telegrams,
     createTelegram,
+    saveDraft,
     updateTelegram,
     deleteTelegram,
   };
