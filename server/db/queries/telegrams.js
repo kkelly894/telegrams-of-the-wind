@@ -94,3 +94,40 @@ export async function createTelegram(
     throw error;
   }
 }
+
+export async function updateTelegram(
+  id,
+  userId,
+  recipientName,
+  message,
+  isAnonymous,
+) {
+  try {
+    const result = await db.query(
+      `
+        UPDATE telegrams
+        SET
+          recipient_name = $1,
+          message = $2,
+          is_anonymous = $3
+        WHERE id = $4
+          AND user_id = $5
+          AND status = 'sent'
+        RETURNING
+          id,
+          user_id,
+          recipient_name,
+          sender_name,
+          message,
+          is_anonymous,
+          status,
+          created_at;
+      `,
+      [recipientName, message, isAnonymous, id, userId],
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    throw error;
+  }
+}

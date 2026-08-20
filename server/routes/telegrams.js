@@ -6,6 +6,7 @@ import {
   createTelegram,
   getAllTelegrams,
   getTelegramById,
+  updateTelegram,
 } from "../db/queries/telegrams.js";
 
 const router = express.Router();
@@ -86,6 +87,40 @@ router.post("/", authenticate, async (req, res) => {
 
     return res.status(500).json({
       message: "Unable to create telegram.",
+    });
+  }
+});
+
+router.patch("/:id", authenticate, async (req, res) => {
+  const { recipient_name, message, is_anonymous } = req.body;
+
+  if (!recipient_name || !message) {
+    return res.status(400).json({
+      message: "Recipient name and message are required.",
+    });
+  }
+
+  try {
+    const updatedTelegram = await updateTelegram(
+      req.params.id,
+      req.user.id,
+      recipient_name,
+      message,
+      is_anonymous || false,
+    );
+
+    if (!updatedTelegram) {
+      return res.status(404).json({
+        message: "Telegram not found or you do not have permission to edit it.",
+      });
+    }
+
+    return res.json(updatedTelegram);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Unable to update telegram.",
     });
   }
 });
