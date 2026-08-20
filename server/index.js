@@ -4,6 +4,7 @@ import cors from "cors";
 import express from "express";
 
 import authRouter from "./routes/auth.js";
+import telegramRouter from "./routes/telegrams.js";
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRouter);
+app.use("/api/telegrams", telegramRouter);
 
 app.get("/", (req, res) => {
   res.json({
