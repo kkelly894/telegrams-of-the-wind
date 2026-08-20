@@ -2,9 +2,12 @@ import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+import authenticate from "../middleware/authenticate.js";
+
 import {
   createUser,
   getUserByEmail,
+  getUserById,
   getUserByUsername,
 } from "../db/queries/users.js";
 
@@ -112,6 +115,26 @@ router.post("/login", async (req, res) => {
 
     return res.status(500).json({
       message: "Unable to log in.",
+    });
+  }
+});
+
+router.get("/current-user", authenticate, async (req, res) => {
+  try {
+    const user = await getUserById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+      });
+    }
+
+    return res.json(user);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Unable to get current user.",
     });
   }
 });
