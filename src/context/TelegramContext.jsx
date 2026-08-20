@@ -83,6 +83,72 @@ export function TelegramProvider({ children }) {
     return updatedTelegram;
   };
 
+  const updateDraft = (id, draftData) => {
+    if (!user) {
+      throw Error("You must be logged in to edit a draft.");
+    }
+
+    const draft = telegrams.find((telegram) => telegram.id === Number(id));
+
+    if (!draft) {
+      throw Error("Draft not found.");
+    }
+
+    if (draft.user_id !== user.id) {
+      throw Error("You can only edit your own drafts.");
+    }
+
+    const updatedDraft = {
+      ...draft,
+      recipient_name: draftData.recipient_name,
+      sender_name: draftData.sender_name,
+      message: draftData.message,
+      is_anonymous: draftData.is_anonymous,
+      status: "draft",
+    };
+
+    setTelegrams((currentTelegrams) =>
+      currentTelegrams.map((telegram) =>
+        telegram.id === Number(id) ? updatedDraft : telegram,
+      ),
+    );
+
+    return updatedDraft;
+  };
+
+  const sendDraft = (id, draftData) => {
+    if (!user) {
+      throw Error("You must be logged in to send a draft.");
+    }
+
+    const draft = telegrams.find((telegram) => telegram.id === Number(id));
+
+    if (!draft) {
+      throw Error("Draft not found.");
+    }
+
+    if (draft.user_id !== user.id) {
+      throw Error("You can only send your own drafts.");
+    }
+
+    const sentTelegram = {
+      ...draft,
+      recipient_name: draftData.recipient_name,
+      sender_name: draftData.sender_name,
+      message: draftData.message,
+      is_anonymous: draftData.is_anonymous,
+      status: "sent",
+    };
+
+    setTelegrams((currentTelegrams) =>
+      currentTelegrams.map((telegram) =>
+        telegram.id === Number(id) ? sentTelegram : telegram,
+      ),
+    );
+
+    return sentTelegram;
+  };
+
   const deleteTelegram = (id) => {
     if (!user) {
       throw Error("You must be logged in to delete a telegram.");
@@ -108,6 +174,8 @@ export function TelegramProvider({ children }) {
     createTelegram,
     saveDraft,
     updateTelegram,
+    updateDraft,
+    sendDraft,
     deleteTelegram,
   };
 

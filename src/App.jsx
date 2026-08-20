@@ -6,6 +6,7 @@ import About from "./pages/About";
 import AllTelegrams from "./pages/AllTelegrams";
 import CreateTelegram from "./pages/CreateTelegram";
 import Drafts from "./pages/Drafts";
+import EditDraft from "./pages/EditDraft";
 import EditTelegram from "./pages/EditTelegram";
 import MyTelegrams from "./pages/MyTelegrams";
 import TelegramDetails from "./pages/TelegramDetails";
@@ -34,6 +35,8 @@ export default function App() {
         <Route path="/account/telegrams" element={<MyTelegrams />} />
 
         <Route path="/drafts" element={<Drafts />} />
+
+        <Route path="/drafts/:id/edit" element={<EditDraft />} />
       </Route>
     </Routes>
   );
