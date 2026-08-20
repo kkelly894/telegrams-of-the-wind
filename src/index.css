@@ -768,3 +768,57 @@ a {
 .no-drafts-message a {
   color: #372d25;
 }
+
+.envelope-container {
+  position: relative;
+
+  width: 320px;
+}
+
+.favorite-button {
+  margin-top: 10px;
+
+  padding: 7px 12px;
+
+  border: 1px solid #9f8565;
+
+  background-color: #fffaf0;
+
+  color: #372d25;
+
+  font-family: "Special Elite", system-ui;
+  font-weight: 400;
+
+  cursor: pointer;
+}
+
+.favorite-button:hover {
+  background-color: #f2e4c5;
+}
+
+.favorite-button-active {
+  background-color: #e8d5ae;
+}
+
+.favorite-stamp {
+  position: absolute;
+
+  top: 15px;
+  right: 15px;
+
+  padding: 8px 7px;
+
+  border: 2px solid #705a43;
+
+  background-color: #e8d5ae;
+
+  color: #705a43;
+
+  font-size: 0.65rem;
+
+  letter-spacing: 1px;
+
+  transform: rotate(6deg);
+
+  pointer-events: none;
+}

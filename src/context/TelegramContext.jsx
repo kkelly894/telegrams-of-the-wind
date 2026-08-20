@@ -7,6 +7,7 @@ const TelegramContext = createContext();
 
 export function TelegramProvider({ children }) {
   const [telegrams, setTelegrams] = useState(mockTelegrams);
+  const [favorites, setFavorites] = useState([]);
 
   const { user } = useAuth();
 
@@ -167,16 +168,70 @@ export function TelegramProvider({ children }) {
     setTelegrams((currentTelegrams) =>
       currentTelegrams.filter((telegram) => telegram.id !== Number(id)),
     );
+
+    setFavorites((currentFavorites) =>
+      currentFavorites.filter(
+        (favorite) => favorite.telegram_id !== Number(id),
+      ),
+    );
+  };
+
+  const isFavorite = (telegramId) => {
+    if (!user) {
+      return false;
+    }
+
+    return favorites.some(
+      (favorite) =>
+        favorite.user_id === user.id &&
+        favorite.telegram_id === Number(telegramId),
+    );
+  };
+
+  const toggleFavorite = (telegramId) => {
+    if (!user) {
+      throw Error("You must be logged in to favorite a telegram.");
+    }
+
+    const favoriteExists = favorites.some(
+      (favorite) =>
+        favorite.user_id === user.id &&
+        favorite.telegram_id === Number(telegramId),
+    );
+
+    if (favoriteExists) {
+      setFavorites((currentFavorites) =>
+        currentFavorites.filter(
+          (favorite) =>
+            !(
+              favorite.user_id === user.id &&
+              favorite.telegram_id === Number(telegramId)
+            ),
+        ),
+      );
+
+      return;
+    }
+
+    const newFavorite = {
+      user_id: user.id,
+      telegram_id: Number(telegramId),
+    };
+
+    setFavorites((currentFavorites) => [...currentFavorites, newFavorite]);
   };
 
   const value = {
     telegrams,
+    favorites,
     createTelegram,
     saveDraft,
     updateTelegram,
     updateDraft,
     sendDraft,
     deleteTelegram,
+    isFavorite,
+    toggleFavorite,
   };
 
   return (
