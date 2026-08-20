@@ -12,24 +12,20 @@ export default function CreateTelegram() {
 
   const onCreateTelegram = async (formData) => {
     const recipientName = formData.get("recipient_name");
+
     const senderName = formData.get("sender_name");
+
     const message = formData.get("message");
+
     const isAnonymous = formData.get("is_anonymous") === "on";
 
     const action = formData.get("action");
 
     setError(null);
 
-    if (action === "send") {
-      if (!recipientName || !senderName || !message) {
-        setError("Please fill out all required fields.");
-        return;
-      }
-    }
-
     try {
       if (action === "draft") {
-        saveDraft({
+        await saveDraft({
           recipient_name: recipientName,
           sender_name: senderName,
           message,
@@ -37,10 +33,17 @@ export default function CreateTelegram() {
         });
 
         navigate("/drafts");
+
         return;
       }
 
-      const newTelegram = createTelegram({
+      if (!recipientName || !senderName || !message) {
+        setError("Please fill out all required fields.");
+
+        return;
+      }
+
+      const newTelegram = await createTelegram({
         recipient_name: recipientName,
         sender_name: senderName,
         message,
@@ -48,8 +51,8 @@ export default function CreateTelegram() {
       });
 
       navigate(`/telegrams/${newTelegram.id}`);
-    } catch (e) {
-      setError(e.message);
+    } catch (error) {
+      setError(error.message);
     }
   };
 
@@ -85,21 +88,21 @@ export default function CreateTelegram() {
 
           <div className="telegram-form-actions">
             <button
-              className="telegram-form-button"
-              type="submit"
-              name="action"
-              value="send"
-            >
-              Send Telegram
-            </button>
-
-            <button
               className="draft-button"
               type="submit"
               name="action"
               value="draft"
             >
               Save Draft
+            </button>
+
+            <button
+              className="telegram-form-button"
+              type="submit"
+              name="action"
+              value="send"
+            >
+              Send Telegram
             </button>
           </div>
         </form>

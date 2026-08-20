@@ -11,13 +11,11 @@ export default function EditDraft() {
 
   const { user } = useAuth();
 
-  const { telegrams, updateDraft, sendDraft } = useTelegrams();
+  const { drafts, updateDraft, sendDraft, deleteDraft } = useTelegrams();
 
   const [error, setError] = useState(null);
 
-  const draft = telegrams.find(
-    (telegram) => telegram.id === Number(id) && telegram.status === "draft",
-  );
+  const draft = drafts.find((draft) => draft.id === Number(id));
 
   if (!draft) {
     return (
@@ -60,7 +58,7 @@ export default function EditDraft() {
 
     try {
       if (action === "draft") {
-        updateDraft(draft.id, {
+        await updateDraft(draft.id, {
           recipient_name: recipientName,
           sender_name: senderName,
           message,
@@ -71,12 +69,20 @@ export default function EditDraft() {
         return;
       }
 
-      if (!recipientName || !senderName || !message) {
-        setError("Please fill out all required fields before sending.");
+      if (action === "delete") {
+        await deleteDraft(draft.id);
+
+        navigate("/drafts");
         return;
       }
 
-      const sentTelegram = sendDraft(draft.id, {
+      if (!recipientName || !senderName || !message) {
+        setError("Please fill out all required fields before sending.");
+
+        return;
+      }
+
+      const sentTelegram = await sendDraft(draft.id, {
         recipient_name: recipientName,
         sender_name: senderName,
         message,
@@ -84,8 +90,8 @@ export default function EditDraft() {
       });
 
       navigate(`/telegrams/${sentTelegram.id}`);
-    } catch (e) {
-      setError(e.message);
+    } catch (error) {
+      setError(error.message);
     }
   };
 
@@ -102,7 +108,7 @@ export default function EditDraft() {
             <input
               type="text"
               name="recipient_name"
-              defaultValue={draft.recipient_name}
+              defaultValue={draft.recipient_name || ""}
             />
           </label>
 
@@ -111,7 +117,7 @@ export default function EditDraft() {
             <input
               type="text"
               name="sender_name"
-              defaultValue={draft.sender_name}
+              defaultValue={draft.sender_name || ""}
             />
           </label>
 
@@ -120,7 +126,7 @@ export default function EditDraft() {
             <textarea
               name="message"
               rows="10"
-              defaultValue={draft.message}
+              defaultValue={draft.message || ""}
             ></textarea>
           </label>
 
@@ -152,6 +158,15 @@ export default function EditDraft() {
               value="send"
             >
               Send Telegram
+            </button>
+
+            <button
+              className="draft-button"
+              type="submit"
+              name="action"
+              value="delete"
+            >
+              Delete Draft
             </button>
           </div>
         </form>

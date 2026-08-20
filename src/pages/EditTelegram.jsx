@@ -59,15 +59,15 @@ export default function EditTelegram() {
     }
 
     try {
-      const updatedTelegram = updateTelegram(telegram.id, {
+      const updatedTelegram = await updateTelegram(telegram.id, {
         recipient_name: recipientName,
         message,
         is_anonymous: isAnonymous,
       });
 
       navigate(`/telegrams/${updatedTelegram.id}`);
-    } catch (e) {
-      setError(e.message);
+    } catch (error) {
+      setError(error.message);
     }
   };
 

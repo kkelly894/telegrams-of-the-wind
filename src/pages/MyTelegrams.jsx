@@ -1,14 +1,8 @@
 import Envelope from "../components/Envelope";
-import { useAuth } from "../auth/AuthContext";
 import { useTelegrams } from "../context/TelegramContext";
 
 export default function MyTelegrams() {
-  const { user } = useAuth();
-  const { telegrams } = useTelegrams();
-
-  const myTelegrams = telegrams.filter(
-    (telegram) => telegram.user_id === user?.id,
-  );
+  const { myTelegrams } = useTelegrams();
 
   return (
     <section className="all-telegrams-page">

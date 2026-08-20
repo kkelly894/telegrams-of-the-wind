@@ -33,6 +33,12 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (token && !user) {
+      getCurrentUser();
+    }
+  }, [token]);
+
   const register = async (credentials) => {
     try {
       const response = await fetch(API + "/api/auth/register", {
@@ -53,8 +59,8 @@ export function AuthProvider({ children }) {
       setUser(result.user);
 
       return result;
-    } catch (e) {
-      throw e;
+    } catch (error) {
+      throw error;
     }
   };
 
@@ -75,10 +81,11 @@ export function AuthProvider({ children }) {
       }
 
       setToken(result.token);
+      setUser(result.user);
 
       return result;
-    } catch (e) {
-      throw e;
+    } catch (error) {
+      throw error;
     }
   };
 
@@ -97,14 +104,17 @@ export function AuthProvider({ children }) {
       const result = await response.json();
 
       if (!response.ok) {
+        setToken(null);
+        setUser(null);
+
         throw Error(result.message || "Unable to get current user.");
       }
 
       setUser(result);
 
       return result;
-    } catch (e) {
-      throw e;
+    } catch (error) {
+      throw error;
     }
   };
 

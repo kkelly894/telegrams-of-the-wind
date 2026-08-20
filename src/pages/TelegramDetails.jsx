@@ -6,6 +6,7 @@ import { useTelegrams } from "../context/TelegramContext";
 
 export default function TelegramDetails() {
   const { id } = useParams();
+
   const navigate = useNavigate();
 
   const { user } = useAuth();
@@ -34,14 +35,15 @@ export default function TelegramDetails() {
 
   const isOwner = user && user.id === telegram.user_id;
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     setError(null);
 
     try {
-      deleteTelegram(telegram.id);
+      await deleteTelegram(telegram.id);
+
       navigate("/account/telegrams");
-    } catch (e) {
-      setError(e.message);
+    } catch (error) {
+      setError(error.message);
     }
   };
 
@@ -50,6 +52,7 @@ export default function TelegramDetails() {
       <article className="telegram-paper">
         <div className="telegram-details-header">
           <p>To:</p>
+
           <h1>{telegram.recipient_name}</h1>
         </div>
 
@@ -60,6 +63,7 @@ export default function TelegramDetails() {
         <div className="telegram-details-footer">
           <div>
             <p>From:</p>
+
             <p>{senderName}</p>
           </div>
 

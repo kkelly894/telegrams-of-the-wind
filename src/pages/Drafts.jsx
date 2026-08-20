@@ -1,15 +1,9 @@
 import { Link } from "react-router";
 
-import { useAuth } from "../auth/AuthContext";
 import { useTelegrams } from "../context/TelegramContext";
 
 export default function Drafts() {
-  const { user } = useAuth();
-  const { telegrams } = useTelegrams();
-
-  const drafts = telegrams.filter(
-    (telegram) => telegram.user_id === user?.id && telegram.status === "draft",
-  );
+  const { drafts } = useTelegrams();
 
   return (
     <section className="all-telegrams-page">

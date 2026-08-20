@@ -1,235 +1,420 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
-import { mockTelegrams } from "../data/mockTelegrams";
 import { useAuth } from "../auth/AuthContext";
+
+const API = import.meta.env.VITE_API;
 
 const TelegramContext = createContext();
 
 export function TelegramProvider({ children }) {
-  const [telegrams, setTelegrams] = useState(mockTelegrams);
+  const { token, user } = useAuth();
+
+  const [telegrams, setTelegrams] = useState([]);
+  const [myTelegrams, setMyTelegrams] = useState([]);
+  const [drafts, setDrafts] = useState([]);
   const [favorites, setFavorites] = useState([]);
 
-  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
 
-  const createTelegram = (telegramData) => {
-    if (!user) {
+  useEffect(() => {
+    getAllTelegrams();
+  }, []);
+
+  useEffect(() => {
+    if (token && user) {
+      getMyTelegrams();
+      getDrafts();
+      getFavorites();
+    } else {
+      setMyTelegrams([]);
+      setDrafts([]);
+      setFavorites([]);
+    }
+  }, [token, user]);
+
+  const getAllTelegrams = async (sort = "newest") => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(API + `/api/telegrams?sort=${sort}`);
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw Error(result.message || "Unable to get telegrams.");
+      }
+
+      setTelegrams(result);
+
+      return result;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getMyTelegrams = async () => {
+    if (!token) {
+      return [];
+    }
+
+    try {
+      const response = await fetch(API + "/api/account/telegrams", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw Error(result.message || "Unable to get your telegrams.");
+      }
+
+      setMyTelegrams(result);
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const createTelegram = async (telegramData) => {
+    if (!token) {
       throw Error("You must be logged in to create a telegram.");
     }
 
-    const newTelegram = {
-      id: Date.now(),
-      user_id: user.id,
-      recipient_name: telegramData.recipient_name,
-      sender_name: telegramData.sender_name,
-      message: telegramData.message,
-      is_anonymous: telegramData.is_anonymous,
-      status: "sent",
-      created_at: new Date().toISOString(),
-    };
+    try {
+      const response = await fetch(API + "/api/telegrams", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(telegramData),
+      });
 
-    setTelegrams((currentTelegrams) => [newTelegram, ...currentTelegrams]);
+      const result = await response.json();
 
-    return newTelegram;
-  };
+      if (!response.ok) {
+        throw Error(result.message || "Unable to create telegram.");
+      }
 
-  const saveDraft = (telegramData) => {
-    if (!user) {
-      throw Error("You must be logged in to save a draft.");
+      setTelegrams((currentTelegrams) => [result, ...currentTelegrams]);
+
+      setMyTelegrams((currentTelegrams) => [result, ...currentTelegrams]);
+
+      return result;
+    } catch (error) {
+      throw error;
     }
-
-    const newDraft = {
-      id: Date.now(),
-      user_id: user.id,
-      recipient_name: telegramData.recipient_name,
-      sender_name: telegramData.sender_name,
-      message: telegramData.message,
-      is_anonymous: telegramData.is_anonymous,
-      status: "draft",
-      created_at: new Date().toISOString(),
-    };
-
-    setTelegrams((currentTelegrams) => [newDraft, ...currentTelegrams]);
-
-    return newDraft;
   };
 
-  const updateTelegram = (id, telegramData) => {
-    if (!user) {
+  const updateTelegram = async (id, telegramData) => {
+    if (!token) {
       throw Error("You must be logged in to edit a telegram.");
     }
 
-    const telegram = telegrams.find((telegram) => telegram.id === Number(id));
+    try {
+      const response = await fetch(API + `/api/telegrams/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(telegramData),
+      });
 
-    if (!telegram) {
-      throw Error("Telegram not found.");
-    }
+      const result = await response.json();
 
-    if (telegram.user_id !== user.id) {
-      throw Error("You can only edit your own telegrams.");
-    }
+      if (!response.ok) {
+        throw Error(result.message || "Unable to update telegram.");
+      }
 
-    const updatedTelegram = {
-      ...telegram,
-      recipient_name: telegramData.recipient_name,
-      message: telegramData.message,
-      is_anonymous: telegramData.is_anonymous,
-    };
-
-    setTelegrams((currentTelegrams) =>
-      currentTelegrams.map((telegram) =>
-        telegram.id === Number(id) ? updatedTelegram : telegram,
-      ),
-    );
-
-    return updatedTelegram;
-  };
-
-  const updateDraft = (id, draftData) => {
-    if (!user) {
-      throw Error("You must be logged in to edit a draft.");
-    }
-
-    const draft = telegrams.find((telegram) => telegram.id === Number(id));
-
-    if (!draft) {
-      throw Error("Draft not found.");
-    }
-
-    if (draft.user_id !== user.id) {
-      throw Error("You can only edit your own drafts.");
-    }
-
-    const updatedDraft = {
-      ...draft,
-      recipient_name: draftData.recipient_name,
-      sender_name: draftData.sender_name,
-      message: draftData.message,
-      is_anonymous: draftData.is_anonymous,
-      status: "draft",
-    };
-
-    setTelegrams((currentTelegrams) =>
-      currentTelegrams.map((telegram) =>
-        telegram.id === Number(id) ? updatedDraft : telegram,
-      ),
-    );
-
-    return updatedDraft;
-  };
-
-  const sendDraft = (id, draftData) => {
-    if (!user) {
-      throw Error("You must be logged in to send a draft.");
-    }
-
-    const draft = telegrams.find((telegram) => telegram.id === Number(id));
-
-    if (!draft) {
-      throw Error("Draft not found.");
-    }
-
-    if (draft.user_id !== user.id) {
-      throw Error("You can only send your own drafts.");
-    }
-
-    const sentTelegram = {
-      ...draft,
-      recipient_name: draftData.recipient_name,
-      sender_name: draftData.sender_name,
-      message: draftData.message,
-      is_anonymous: draftData.is_anonymous,
-      status: "sent",
-    };
-
-    setTelegrams((currentTelegrams) =>
-      currentTelegrams.map((telegram) =>
-        telegram.id === Number(id) ? sentTelegram : telegram,
-      ),
-    );
-
-    return sentTelegram;
-  };
-
-  const deleteTelegram = (id) => {
-    if (!user) {
-      throw Error("You must be logged in to delete a telegram.");
-    }
-
-    const telegram = telegrams.find((telegram) => telegram.id === Number(id));
-
-    if (!telegram) {
-      throw Error("Telegram not found.");
-    }
-
-    if (telegram.user_id !== user.id) {
-      throw Error("You can only delete your own telegrams.");
-    }
-
-    setTelegrams((currentTelegrams) =>
-      currentTelegrams.filter((telegram) => telegram.id !== Number(id)),
-    );
-
-    setFavorites((currentFavorites) =>
-      currentFavorites.filter(
-        (favorite) => favorite.telegram_id !== Number(id),
-      ),
-    );
-  };
-
-  const isFavorite = (telegramId) => {
-    if (!user) {
-      return false;
-    }
-
-    return favorites.some(
-      (favorite) =>
-        favorite.user_id === user.id &&
-        favorite.telegram_id === Number(telegramId),
-    );
-  };
-
-  const toggleFavorite = (telegramId) => {
-    if (!user) {
-      throw Error("You must be logged in to favorite a telegram.");
-    }
-
-    const favoriteExists = favorites.some(
-      (favorite) =>
-        favorite.user_id === user.id &&
-        favorite.telegram_id === Number(telegramId),
-    );
-
-    if (favoriteExists) {
-      setFavorites((currentFavorites) =>
-        currentFavorites.filter(
-          (favorite) =>
-            !(
-              favorite.user_id === user.id &&
-              favorite.telegram_id === Number(telegramId)
-            ),
+      setTelegrams((currentTelegrams) =>
+        currentTelegrams.map((telegram) =>
+          telegram.id === Number(id) ? result : telegram,
         ),
       );
 
-      return;
+      setMyTelegrams((currentTelegrams) =>
+        currentTelegrams.map((telegram) =>
+          telegram.id === Number(id) ? result : telegram,
+        ),
+      );
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const deleteTelegram = async (id) => {
+    if (!token) {
+      throw Error("You must be logged in to delete a telegram.");
     }
 
-    const newFavorite = {
-      user_id: user.id,
-      telegram_id: Number(telegramId),
-    };
+    try {
+      const response = await fetch(API + `/api/telegrams/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    setFavorites((currentFavorites) => [...currentFavorites, newFavorite]);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw Error(result.message || "Unable to delete telegram.");
+      }
+
+      setTelegrams((currentTelegrams) =>
+        currentTelegrams.filter((telegram) => telegram.id !== Number(id)),
+      );
+
+      setMyTelegrams((currentTelegrams) =>
+        currentTelegrams.filter((telegram) => telegram.id !== Number(id)),
+      );
+
+      setFavorites((currentFavorites) =>
+        currentFavorites.filter((telegram) => telegram.id !== Number(id)),
+      );
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const getDrafts = async () => {
+    if (!token) {
+      return [];
+    }
+
+    try {
+      const response = await fetch(API + "/api/drafts", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw Error(result.message || "Unable to get drafts.");
+      }
+
+      setDrafts(result);
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const saveDraft = async (draftData) => {
+    if (!token) {
+      throw Error("You must be logged in to save a draft.");
+    }
+
+    try {
+      const response = await fetch(API + "/api/drafts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(draftData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw Error(result.message || "Unable to save draft.");
+      }
+
+      setDrafts((currentDrafts) => [result, ...currentDrafts]);
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const updateDraft = async (id, draftData) => {
+    if (!token) {
+      throw Error("You must be logged in to edit a draft.");
+    }
+
+    try {
+      const response = await fetch(API + `/api/drafts/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(draftData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw Error(result.message || "Unable to update draft.");
+      }
+
+      setDrafts((currentDrafts) =>
+        currentDrafts.map((draft) =>
+          draft.id === Number(id) ? result : draft,
+        ),
+      );
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const sendDraft = async (id, draftData) => {
+    if (!token) {
+      throw Error("You must be logged in to send a draft.");
+    }
+
+    try {
+      const response = await fetch(API + `/api/drafts/${id}/send`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(draftData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw Error(result.message || "Unable to send draft.");
+      }
+
+      setDrafts((currentDrafts) =>
+        currentDrafts.filter((draft) => draft.id !== Number(id)),
+      );
+
+      setTelegrams((currentTelegrams) => [result, ...currentTelegrams]);
+
+      setMyTelegrams((currentTelegrams) => [result, ...currentTelegrams]);
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const deleteDraft = async (id) => {
+    if (!token) {
+      throw Error("You must be logged in to delete a draft.");
+    }
+
+    try {
+      const response = await fetch(API + `/api/drafts/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw Error(result.message || "Unable to delete draft.");
+      }
+
+      setDrafts((currentDrafts) =>
+        currentDrafts.filter((draft) => draft.id !== Number(id)),
+      );
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const getFavorites = async () => {
+    if (!token) {
+      return [];
+    }
+
+    try {
+      const response = await fetch(API + "/api/favorites", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw Error(result.message || "Unable to get favorites.");
+      }
+
+      setFavorites(result);
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const isFavorite = (telegramId) => {
+    return favorites.some((telegram) => telegram.id === Number(telegramId));
+  };
+
+  const toggleFavorite = async (telegramId) => {
+    if (!token) {
+      throw Error("You must be logged in to favorite a telegram.");
+    }
+
+    const favorite = isFavorite(telegramId);
+
+    try {
+      const response = await fetch(API + `/api/favorites/${telegramId}`, {
+        method: favorite ? "DELETE" : "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw Error(result.message || "Unable to update favorite.");
+      }
+
+      await getFavorites();
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
   };
 
   const value = {
     telegrams,
+    myTelegrams,
+    drafts,
     favorites,
+    loading,
+    getAllTelegrams,
+    getMyTelegrams,
     createTelegram,
-    saveDraft,
     updateTelegram,
+    deleteTelegram,
+    getDrafts,
+    saveDraft,
     updateDraft,
     sendDraft,
-    deleteTelegram,
+    deleteDraft,
+    getFavorites,
     isFavorite,
     toggleFavorite,
   };

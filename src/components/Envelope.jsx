@@ -14,8 +14,12 @@ export default function Envelope({ telegram }) {
 
   const favorite = isFavorite(telegram.id);
 
-  const handleFavorite = () => {
-    toggleFavorite(telegram.id);
+  const handleFavorite = async () => {
+    try {
+      await toggleFavorite(telegram.id);
+    } catch (error) {
+      console.error(error.message);
+    }
   };
 
   return (
@@ -30,6 +34,7 @@ export default function Envelope({ telegram }) {
 
           <div className="envelope-sender">
             <p>From:</p>
+
             <p>{senderName}</p>
           </div>
 

@@ -1,22 +1,10 @@
 import { Link } from "react-router";
 
 import Envelope from "../components/Envelope";
-import { useAuth } from "../auth/AuthContext";
 import { useTelegrams } from "../context/TelegramContext";
 
 export default function Favorites() {
-  const { user } = useAuth();
-
-  const { telegrams, favorites } = useTelegrams();
-
-  const favoriteTelegramIds = favorites
-    .filter((favorite) => favorite.user_id === user?.id)
-    .map((favorite) => favorite.telegram_id);
-
-  const favoriteTelegrams = telegrams.filter(
-    (telegram) =>
-      favoriteTelegramIds.includes(telegram.id) && telegram.status !== "draft",
-  );
+  const { favorites } = useTelegrams();
 
   return (
     <section className="all-telegrams-page">
@@ -26,7 +14,7 @@ export default function Favorites() {
         <p>Telegrams you have saved with a favorite stamp.</p>
       </div>
 
-      {favoriteTelegrams.length === 0 ? (
+      {favorites.length === 0 ? (
         <div className="no-favorites-message">
           <p>You have not favorited any telegrams yet.</p>
 
@@ -34,7 +22,7 @@ export default function Favorites() {
         </div>
       ) : (
         <div className="telegram-grid">
-          {favoriteTelegrams.map((telegram) => (
+          {favorites.map((telegram) => (
             <Envelope key={telegram.id} telegram={telegram} />
           ))}
         </div>

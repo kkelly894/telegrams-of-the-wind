@@ -1,27 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Envelope from "../components/Envelope";
 import { useTelegrams } from "../context/TelegramContext";
 
 export default function AllTelegrams() {
-  const { telegrams } = useTelegrams();
+  const { telegrams, getAllTelegrams, loading } = useTelegrams();
 
   const [sortOrder, setSortOrder] = useState("newest");
 
-  const sentTelegrams = telegrams.filter(
-    (telegram) => telegram.status !== "draft",
-  );
+  useEffect(() => {
+    getAllTelegrams(sortOrder);
+  }, [sortOrder]);
 
-  const sortedTelegrams = [...sentTelegrams].sort((a, b) => {
-    const dateA = new Date(a.created_at);
-    const dateB = new Date(b.created_at);
-
-    if (sortOrder === "newest") {
-      return dateB - dateA;
-    }
-
-    return dateA - dateB;
-  });
+  if (loading) {
+    return (
+      <section className="all-telegrams-page">
+        <p>Loading telegrams...</p>
+      </section>
+    );
+  }
 
   return (
     <section className="all-telegrams-page">
@@ -46,7 +43,7 @@ export default function AllTelegrams() {
       </div>
 
       <div className="telegram-grid">
-        {sortedTelegrams.map((telegram) => (
+        {telegrams.map((telegram) => (
           <Envelope key={telegram.id} telegram={telegram} />
         ))}
       </div>
