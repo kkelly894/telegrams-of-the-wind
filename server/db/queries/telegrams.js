@@ -177,3 +177,167 @@ export async function getTelegramsByUserId(userId) {
     throw error;
   }
 }
+
+export async function createDraft(
+  userId,
+  recipientName,
+  senderName,
+  message,
+  isAnonymous,
+) {
+  try {
+    const result = await db.query(
+      `
+        INSERT INTO telegrams (
+          user_id,
+          recipient_name,
+          sender_name,
+          message,
+          is_anonymous,
+          status
+        )
+        VALUES ($1, $2, $3, $4, $5, 'draft')
+        RETURNING
+          id,
+          user_id,
+          recipient_name,
+          sender_name,
+          message,
+          is_anonymous,
+          status,
+          created_at;
+      `,
+      [userId, recipientName, senderName, message, isAnonymous],
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function getDraftsByUserId(userId) {
+  try {
+    const result = await db.query(
+      `
+        SELECT
+          id,
+          user_id,
+          recipient_name,
+          sender_name,
+          message,
+          is_anonymous,
+          status,
+          created_at
+        FROM telegrams
+        WHERE user_id = $1
+          AND status = 'draft'
+        ORDER BY created_at DESC;
+      `,
+      [userId],
+    );
+
+    return result.rows;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function updateDraft(
+  id,
+  userId,
+  recipientName,
+  senderName,
+  message,
+  isAnonymous,
+) {
+  try {
+    const result = await db.query(
+      `
+        UPDATE telegrams
+        SET
+          recipient_name = $1,
+          sender_name = $2,
+          message = $3,
+          is_anonymous = $4
+        WHERE id = $5
+          AND user_id = $6
+          AND status = 'draft'
+        RETURNING
+          id,
+          user_id,
+          recipient_name,
+          sender_name,
+          message,
+          is_anonymous,
+          status,
+          created_at;
+      `,
+      [recipientName, senderName, message, isAnonymous, id, userId],
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function sendDraft(
+  id,
+  userId,
+  recipientName,
+  senderName,
+  message,
+  isAnonymous,
+) {
+  try {
+    const result = await db.query(
+      `
+        UPDATE telegrams
+        SET
+          recipient_name = $1,
+          sender_name = $2,
+          message = $3,
+          is_anonymous = $4,
+          status = 'sent',
+          created_at = CURRENT_TIMESTAMP
+        WHERE id = $5
+          AND user_id = $6
+          AND status = 'draft'
+        RETURNING
+          id,
+          user_id,
+          recipient_name,
+          sender_name,
+          message,
+          is_anonymous,
+          status,
+          created_at;
+      `,
+      [recipientName, senderName, message, isAnonymous, id, userId],
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function deleteDraft(id, userId) {
+  try {
+    const result = await db.query(
+      `
+        DELETE FROM telegrams
+        WHERE id = $1
+          AND user_id = $2
+          AND status = 'draft'
+        RETURNING id;
+      `,
+      [id, userId],
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    throw error;
+  }
+}
