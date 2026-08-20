@@ -56,3 +56,41 @@ export async function getTelegramById(id) {
     throw error;
   }
 }
+
+export async function createTelegram(
+  userId,
+  recipientName,
+  senderName,
+  message,
+  isAnonymous,
+) {
+  try {
+    const result = await db.query(
+      `
+        INSERT INTO telegrams (
+          user_id,
+          recipient_name,
+          sender_name,
+          message,
+          is_anonymous,
+          status
+        )
+        VALUES ($1, $2, $3, $4, $5, 'sent')
+        RETURNING
+          id,
+          user_id,
+          recipient_name,
+          sender_name,
+          message,
+          is_anonymous,
+          status,
+          created_at;
+      `,
+      [userId, recipientName, senderName, message, isAnonymous],
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    throw error;
+  }
+}

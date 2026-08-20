@@ -1,6 +1,12 @@
 import express from "express";
 
-import { getAllTelegrams, getTelegramById } from "../db/queries/telegrams.js";
+import authenticate from "../middleware/authenticate.js";
+
+import {
+  createTelegram,
+  getAllTelegrams,
+  getTelegramById,
+} from "../db/queries/telegrams.js";
 
 const router = express.Router();
 
@@ -52,6 +58,34 @@ router.get("/:id", async (req, res) => {
 
     return res.status(500).json({
       message: "Unable to get telegram.",
+    });
+  }
+});
+
+router.post("/", authenticate, async (req, res) => {
+  const { recipient_name, sender_name, message, is_anonymous } = req.body;
+
+  if (!recipient_name || !sender_name || !message) {
+    return res.status(400).json({
+      message: "Recipient name, sender name, and message are required.",
+    });
+  }
+
+  try {
+    const telegram = await createTelegram(
+      req.user.id,
+      recipient_name,
+      sender_name,
+      message,
+      is_anonymous || false,
+    );
+
+    return res.status(201).json(telegram);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Unable to create telegram.",
     });
   }
 });
