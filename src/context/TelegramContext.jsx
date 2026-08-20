@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 import { useAuth } from "../auth/AuthContext";
 
-const API = import.meta.env.VITE_API;
+const API = import.meta.env.VITE_API || "";
 
 const TelegramContext = createContext();
 
