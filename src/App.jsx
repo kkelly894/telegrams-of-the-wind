@@ -8,6 +8,7 @@ import CreateTelegram from "./pages/CreateTelegram";
 import Drafts from "./pages/Drafts";
 import EditDraft from "./pages/EditDraft";
 import EditTelegram from "./pages/EditTelegram";
+import Favorites from "./pages/Favorites";
 import MyTelegrams from "./pages/MyTelegrams";
 import TelegramDetails from "./pages/TelegramDetails";
 
@@ -37,6 +38,8 @@ export default function App() {
         <Route path="/drafts" element={<Drafts />} />
 
         <Route path="/drafts/:id/edit" element={<EditDraft />} />
+
+        <Route path="/favorites" element={<Favorites />} />
       </Route>
     </Routes>
   );

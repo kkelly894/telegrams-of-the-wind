@@ -50,6 +50,10 @@ export default function Navbar() {
                 <NavLink to="/drafts" onClick={closeMenu}>
                   Drafts
                 </NavLink>
+
+                <NavLink to="/favorites" onClick={closeMenu}>
+                  Favorites
+                </NavLink>
               </>
             )}
           </div>

@@ -822,3 +822,13 @@ a {
 
   pointer-events: none;
 }
+
+.no-favorites-message {
+  text-align: center;
+
+  color: #705a43;
+}
+
+.no-favorites-message a {
+  color: #372d25;
+}
