@@ -719,3 +719,52 @@ a {
 .delete-telegram-button:hover {
   text-decoration: underline;
 }
+
+.draft-grid {
+  display: grid;
+
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+
+  gap: 30px;
+}
+
+.draft-card {
+  padding: 25px;
+
+  border: 1px solid #9f8565;
+
+  background-color: #f8efd9;
+
+  color: #372d25;
+}
+
+.draft-card h2 {
+  margin: 5px 0 20px;
+
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.draft-preview {
+  min-height: 70px;
+
+  line-height: 1.6;
+}
+
+.draft-link {
+  display: inline-block;
+
+  margin-top: 15px;
+
+  color: #372d25;
+}
+
+.no-drafts-message {
+  text-align: center;
+
+  color: #705a43;
+}
+
+.no-drafts-message a {
+  color: #372d25;
+}

@@ -46,6 +46,10 @@ export default function Navbar() {
                 <NavLink to="/account/telegrams" onClick={closeMenu}>
                   My Telegrams
                 </NavLink>
+
+                <NavLink to="/drafts" onClick={closeMenu}>
+                  Drafts
+                </NavLink>
               </>
             )}
           </div>
