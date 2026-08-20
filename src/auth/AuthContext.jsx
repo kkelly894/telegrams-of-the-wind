@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
+const API = import.meta.env.VITE_API;
+
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
@@ -33,21 +35,24 @@ export function AuthProvider({ children }) {
 
   const register = async (credentials) => {
     try {
-      const mockUser = {
-        id: 1,
-        username: credentials.username,
-        email: credentials.email,
-      };
+      const response = await fetch(API + "/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credentials),
+      });
 
-      const mockToken = "mock-token";
+      const result = await response.json();
 
-      setUser(mockUser);
-      setToken(mockToken);
+      if (!response.ok) {
+        throw Error(result.message || "Registration failed.");
+      }
 
-      return {
-        token: mockToken,
-        user: mockUser,
-      };
+      setToken(result.token);
+      setUser(result.user);
+
+      return result;
     } catch (e) {
       throw e;
     }
@@ -55,21 +60,49 @@ export function AuthProvider({ children }) {
 
   const login = async (credentials) => {
     try {
-      const mockUser = {
-        id: 1,
-        username: "exampleUser",
-        email: credentials.email,
-      };
+      const response = await fetch(API + "/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credentials),
+      });
 
-      const mockToken = "mock-token";
+      const result = await response.json();
 
-      setUser(mockUser);
-      setToken(mockToken);
+      if (!response.ok) {
+        throw Error(result.message || "Login failed.");
+      }
 
-      return {
-        token: mockToken,
-        user: mockUser,
-      };
+      setToken(result.token);
+
+      return result;
+    } catch (e) {
+      throw e;
+    }
+  };
+
+  const getCurrentUser = async () => {
+    try {
+      if (!token) {
+        return null;
+      }
+
+      const response = await fetch(API + "/api/auth/current-user", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw Error(result.message || "Unable to get current user.");
+      }
+
+      setUser(result);
+
+      return result;
     } catch (e) {
       throw e;
     }
@@ -88,6 +121,7 @@ export function AuthProvider({ children }) {
     user,
     register,
     login,
+    getCurrentUser,
     logout,
   };
 
