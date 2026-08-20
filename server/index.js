@@ -6,6 +6,7 @@ import express from "express";
 import accountRouter from "./routes/account.js";
 import authRouter from "./routes/auth.js";
 import draftRouter from "./routes/drafts.js";
+import favoriteRouter from "./routes/favorites.js";
 import telegramRouter from "./routes/telegrams.js";
 
 const app = express();
@@ -22,6 +23,8 @@ app.use("/api/telegrams", telegramRouter);
 app.use("/api/account", accountRouter);
 
 app.use("/api/drafts", draftRouter);
+
+app.use("/api/favorites", favoriteRouter);
 
 app.get("/", (req, res) => {
   res.json({
